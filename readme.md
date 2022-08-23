@@ -82,18 +82,23 @@ spring.jpa.properties.hibernate.jdbc.order_updates: true
   
 - 선수 고유 식별자 메타데이터 조회
   - `/api/players`
-
+  
 - 선수 고유 식별자 메타데이터 db에 저장
   - `/api/players`  조회 제거
   - ``` dto -> entity -> saveAll```
   
 - 매치 종류, 시즌 아이디 메타데이터 db에 저장
   - `matchTypeDto, SeasonIdDto` - `entity` - `save`
+  
+
+- Spring 5.0 이상부터 restTemplate `Deprecated`
+  - Spring webFlux 에서 제공하는 WebClient 사용권장
+    - ApiClient.class API 요청`HttpClient` 모듈 `restTemplate` - `WebClient` 로 변경
+  
+  
+### ❗ 이슈 
 
 ---
-
-
-### ❗ 이슈 
 
 
 - 선수 메타데이터 저장시 insert 할 데이터가 많아 저장하는데 시간이 너무 걸림
@@ -104,3 +109,24 @@ spring.jpa.properties.hibernate.jdbc.order_updates: true
 - Dto 에 `null` 이 들어가는 현상
   - dto 변수명과 json 변수명이 동일해야함.
     - matchType -> matchtype
+  
+
+- WebClient 에서 uriBuilderFactory() -> baseUrl() 설정후 get 요청시 uri(String uri)를 쓰면 java.net.Exception 발생
+    - 혹시나 해서 Webclient 코드를 찾아보니 `baseUrl()`은 `UriBuilderFactory` 와 함께 쓰면 baseUrl이 무시된다는 걸 찾을수 있었다. 
+      ```
+      Note: this method is mutually exclusive with uriBuilderFactory(UriBuilderFactory). If both are used, the baseUrl value provided here will be ignored.
+      ```
+```java
+ @Bean
+    public WebClient webClient() {
+        // api key encoding 
+         // ..
+        return WebClient.builder()
+                .uriBuilderFactory(factory) <- key 인코딩떄문에 사전에 uriBuilder 를 만들었다.
+               // .baseUrl() <- baseUrl 의 값이 무시된다.
+                .....
+        
+                .build();
+    }
+
+```

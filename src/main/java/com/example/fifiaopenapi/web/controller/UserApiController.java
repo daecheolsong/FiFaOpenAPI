@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+
 @RestController
 @RequiredArgsConstructor
 public class UserApiController {
@@ -20,7 +21,6 @@ public class UserApiController {
     @GetMapping("/")
     public String init() {
         userService.setMetaData();
-
         return "saved successfully";
     }
 
@@ -29,13 +29,4 @@ public class UserApiController {
         return userService.getUserInfo(nickname);
     }
 
-//    @GetMapping("/api/players")
-//    public PlayerMetadataInfoDto [] savePlayerInfo() {
-//        return userService.savePlayerMetadataInfo();
-//    }
-
-//    @GetMapping("/api/matchTypes")
-//    public MatchTypeDto[] getMatchTypes() {
-//        return userService.getMatchType();
-//    }
 }

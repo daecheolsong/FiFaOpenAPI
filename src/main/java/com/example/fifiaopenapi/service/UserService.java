@@ -13,8 +13,10 @@ import com.example.fifiaopenapi.web.dto.UserInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
+import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -35,35 +37,34 @@ public class UserService {
     // save meta data
 
     public void savePlayerMetadataInfo() {
-        PlayerMetadataInfoDto[] playerMetadataInfoDtos = apiClient.requestPlayerMetadataInfo();
+//        PlayerMetadataInfoDto[] playerMetadataInfoDtos = apiClient.requestPlayerMetadataInfo();
+        List<PlayerMetadataInfoDto> playerMetadataInfoDtos = apiClient.requestWebClientPlayerMetadataInfo();
+
         ArrayList<Player> savePlayers = new ArrayList<>();
-        for (int i = 0; i < playerMetadataInfoDtos.length; i++) {
-            playerMetadataInfoDtos[i].setActionImage(actionImageUrl.replace("{spid}",String.valueOf(playerMetadataInfoDtos[i].getId())));
-            playerMetadataInfoDtos[i].setCommonImage(commonImageUrl.replace("{spid}",String.valueOf(playerMetadataInfoDtos[i].getId())));
-            savePlayers.add(playerMetadataInfoDtos[i].toEntity());
+        for (int i = 0; i < playerMetadataInfoDtos.size(); i++) {
+            playerMetadataInfoDtos.get(i).setActionImage(actionImageUrl.replace("{spid}",String.valueOf(playerMetadataInfoDtos.get(i).getId())));
+            playerMetadataInfoDtos.get(i).setCommonImage(commonImageUrl.replace("{spid}",String.valueOf(playerMetadataInfoDtos.get(i).getId())));
+            savePlayers.add(playerMetadataInfoDtos.get(i).toEntity());
         }
 
         playerRepository.saveAll(savePlayers);
     }
-//    public MatchTypeDto[] getMatchType() {
-//        MatchTypeDto[] matchTypeDtos = apiClient.requestMatchType();
-//        return matchTypeDtos;
-//    }
-
 
 
     public void saveMatchType() {
-        MatchTypeDto[] matchTypes = apiClient.requestMatchType();
-        for (MatchTypeDto matchType : matchTypes) {
+//        MatchTypeDto[] matchTypes = apiClient.requestMatchType();
+        List<MatchTypeDto> matchTypeDtos = apiClient.requestWebClientMatchType();
+        for (MatchTypeDto matchType : matchTypeDtos) {
             matchTypeRepository.save(matchType.toEntity());
         }
     }
 
     public void saveSeasonId() {
-        SeasonIdDto[] seasonIdDtos = apiClient.requestSeasonId();
+//        SeasonIdDto[] seasonIdDtos = apiClient.requestSeasonId();
+        List<SeasonIdDto> seasonIdDtos = apiClient.requestWebClientSeasonId();
         ArrayList<SeasonId> seasonIds = new ArrayList<>();
-        for (int i = 0; i < seasonIdDtos.length; i++) {
-            seasonIds.add(seasonIdDtos[i].toEntity());
+        for (int i = 0; i < seasonIdDtos.size(); i++) {
+            seasonIds.add(seasonIdDtos.get(i).toEntity());
         }
         seasonIdRepository.saveAll(seasonIds);
 

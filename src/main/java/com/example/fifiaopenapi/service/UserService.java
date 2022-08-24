@@ -6,10 +6,7 @@ import com.example.fifiaopenapi.domain.SeasonId;
 import com.example.fifiaopenapi.repository.MatchTypeRepository;
 import com.example.fifiaopenapi.repository.PlayerRepository;
 import com.example.fifiaopenapi.repository.SeasonIdRepository;
-import com.example.fifiaopenapi.web.dto.MatchTypeDto;
-import com.example.fifiaopenapi.web.dto.PlayerMetadataInfoDto;
-import com.example.fifiaopenapi.web.dto.SeasonIdDto;
-import com.example.fifiaopenapi.web.dto.UserInfoDto;
+import com.example.fifiaopenapi.web.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
@@ -29,9 +26,6 @@ public class UserService {
     private final String actionImageUrl = "https://fo4.dn.nexoncdn.co.kr/live/externalAssets/common/playersAction/p{spid}.png";
     private final String commonImageUrl = "https://fo4.dn.nexoncdn.co.kr/live/externalAssets/common/players/p{spid}.png";
 
-    public UserInfoDto getUserInfo(String nickname) {
-        return apiClient.requestUserInfo(nickname);
-    }
 
 
     // save meta data
@@ -83,4 +77,31 @@ public class UserService {
         stopWatch.stop();
         System.out.println(stopWatch.prettyPrint());
     }
+
+    // 조회
+
+    // 유저 정보
+    public UserInfoDto getUserInfo(String nickname) {
+        return apiClient.requestUserInfo(nickname);
+    }
+
+    // 선수 포지션
+    public List<PositionDto> getPosition() {
+        return apiClient.requestWebClientPosition();
+    }
+
+    // 유저 등급 조회
+    public List<DivisionDto> getDivision() {
+        return apiClient.requestWebClientDivision();
+    }
+
+    public String [] getUserMatchIds(String accessId, String matchType, String offset, String limit) {
+        return apiClient.requestWebClientUserMatchIds(accessId, matchType, offset, limit);
+    }
+
+    public MatchResultDto getMatchResultByMatchId(String matchId) {
+        return apiClient.requestWebClientUserResultByMatchId(matchId);
+    }
+
+
 }

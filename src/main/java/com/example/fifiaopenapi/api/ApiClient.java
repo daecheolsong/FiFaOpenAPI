@@ -1,17 +1,9 @@
 package com.example.fifiaopenapi.api;
 
-import com.example.fifiaopenapi.web.dto.MatchTypeDto;
-import com.example.fifiaopenapi.web.dto.PlayerMetadataInfoDto;
-import com.example.fifiaopenapi.web.dto.SeasonIdDto;
-import com.example.fifiaopenapi.web.dto.UserInfoDto;
+import com.example.fifiaopenapi.web.dto.*;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,14 +15,16 @@ public class ApiClient {
     private final WebClient webClient;
 //    private final RestTemplate restTemplate; Deprecated
     private final String API_KEY = Apikey.API_KEY;
-    private final String UserInfoUrl = "https://api.nexon.co.kr/fifaonline4/v1.0/users";
+    private final String USER_URL = "https://api.nexon.co.kr/fifaonline4/v1.0/users";
+    private final String MATCH_URL = "https://api.nexon.co.kr/fifaonline4/v1.0/matches";
 
     public UserInfoDto requestUserInfo(String nickname) {
 
-        return WebClient.create(UserInfoUrl)
+        return WebClient.create(USER_URL)
                 .get()
                 .uri(uriBuilder ->
-                        uriBuilder.queryParam("nickname", nickname)
+                        uriBuilder
+                                .queryParam("nickname", nickname)
                                 .build())
                 .header(HttpHeaders.AUTHORIZATION, API_KEY)
                 .retrieve()
@@ -96,7 +90,59 @@ public class ApiClient {
                 .collect(Collectors.toList());
     }
 
+    public List<PositionDto> requestWebClientPosition() {
 
+        return webClient
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/fifaonline4/latest/spposition.json")
+                        .build())
+                .retrieve()
+                .bodyToFlux(PositionDto.class)
+                .toStream()
+                .collect(Collectors.toList());
+    }
 
+    public List<DivisionDto> requestWebClientDivision() {
+
+        return
+                webClient
+                        .get()
+                        .uri(uriBuilder -> uriBuilder.path("/fifaonline4/latest/division.json")
+                                .build())
+                        .retrieve()
+                        .bodyToFlux(DivisionDto.class)
+                        .toStream()
+                        .collect(Collectors.toList());
+    }
+
+    // 유저 매치 ID
+    public String[] requestWebClientUserMatchIds(String accessId, String matchType, String offset, String limit) {
+
+        return
+                WebClient
+                        .create(USER_URL)
+                        .get()
+                        .uri(uriBuilder -> uriBuilder.path("/{accessid}/matches")
+                                .queryParam("matchType", matchType)
+                                .queryParam("offset", offset)
+                                .queryParam("limit", limit)
+                                .build(accessId))
+                        .header(HttpHeaders.AUTHORIZATION, API_KEY)
+                        .retrieve()
+                        .bodyToMono(String[].class)
+                        .block();
+
+    }
+
+    public MatchResultDto requestWebClientUserResultByMatchId(String matchId) {
+        return WebClient.create(MATCH_URL)
+                .get()
+                .uri(uriBuilder -> uriBuilder.path("/{matchid}")
+                        .build(matchId))
+                .header(HttpHeaders.AUTHORIZATION, API_KEY)
+                .retrieve()
+                .bodyToMono(MatchResultDto.class)
+                .block();
+    }
 
 }

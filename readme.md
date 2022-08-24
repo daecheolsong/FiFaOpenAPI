@@ -96,6 +96,47 @@ spring.jpa.properties.hibernate.jdbc.order_updates: true
     - ApiClient.class API 요청`HttpClient` 모듈 `restTemplate` - `WebClient` 로 변경
   
   
+- 선수 포지션 종류 조회
+  - `/api/position`
+  
+
+- 등급 종류 조회
+  - `/api/division`
+
+
+- 유저 ID 로 MatchID 조회
+  - `/api/user/matches/{accessId}/{matchtype}`
+
+
+- MatchID로 MatchResult 조회
+  - `/api/match/result/{matchid}`
+    - `MatchResultDto`
+    
+    ```java 
+    public class MatchResultDto {
+    String matchId;
+    String matchDate;
+    String matchType;
+    List<MatchInfoDto> matchInfo;
+    }
+    ```
+    - `MatchInfoDto`
+  
+    ```java
+    @Data
+    public class MatchInfoDto {
+    private String accessId;  
+    private String nickname;
+    private MatchDetailDto matchDetail;
+    private ShootDto shoot;
+    private List<ShootDetailDto> shootDetail;
+    private PassDto pass;
+    private DefenceDto defence;
+    private List<PlayerDto> player;
+    }
+    ```
+  
+
 ### ❗ 이슈 
 
 ---
@@ -130,3 +171,32 @@ spring.jpa.properties.hibernate.jdbc.order_updates: true
     }
 
 ```
+- MatchResultDto 를 받아오는데, JSON 형태가 복잡하여 JSON to Object 하는 과정이 복잡한줄 알았는데, JSON 형태에 맞게 Dto 를 잘설계하면 알아서 `httpMessageConveter` 변환해줌
+  - Json Data
+    ```
+    { k:v 
+      k:v
+      ....
+      matchInfo:[{
+        k:v
+        ...
+        shootDetail:[{
+          k:v
+          ...
+          }
+          ...
+          ]
+        ]
+        matchDetail:[{
+          k:v
+          ...
+          }
+          ...
+        ]
+      }
+      ...
+      ]
+    }
+    
+    ```
+    대충 이런형태.. 들여쓰기 참고하면서 `{}` 는 `Object` `[]` 는 `List` 로 판단하고 `MatchResultDto`를 만들어 실행해보았는데 잘 전환이 되었다.
